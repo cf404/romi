@@ -6,62 +6,95 @@ package frc.robot.commands;
 
 import frc.robot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import java.util.ArrayList;
 
 public class AutonomousDistance extends SequentialCommandGroup {
-  /**
-   * Creates a new Autonomous Drive based on distance. This will drive out for a specified distance,
-   * turn around and drive back.
-   *
-   * @param drivetrain The drivetrain subsystem on which this command will run
-   */
+  private ArrayList<Runnable> commandQueue;
+  private Drivetrain m_drivetrain;
+
+  private double straightSpeed = 0.5;
+  private double turnDegrees = 65;
+  private double turnSpeed = 0.5;
+  private double driveDistance = 10;
+  private double triangleTurnDegrees = 90;
+  private double hexagonTurnDegrees = 40;
+  private double hexagonInfinityDrivingDistance = 5;
+  private double InfinityTurnDegrees = 60;
+
   public AutonomousDistance(Drivetrain drivetrain) {
-    double straightSpeed = 0.5;
-    double turnSpeed = 0.5;
-    double turnDegrees = 65;
-    double driveDistance = 10;
-    double triangleTurnDegrees = 90;
-    double hexagonTurnDegrees = 40;
-    double hexagonInfinityDrivingDistance = 5;
-    double InfinityTurnDegrees = 60;
-    addCommands(
-
-    // Square 
-        new DriveDistance(-straightSpeed, driveDistance, drivetrain),
-        new TurnDegrees(turnSpeed, turnDegrees, drivetrain),
-        new DriveDistance(-straightSpeed, driveDistance, drivetrain),
-        new TurnDegrees(turnSpeed, turnDegrees, drivetrain),
-        new DriveDistance(-straightSpeed, driveDistance, drivetrain),
-        new TurnDegrees(turnSpeed, turnDegrees, drivetrain),
-        new DriveDistance(-straightSpeed, driveDistance, drivetrain),
-        new TurnDegrees(turnSpeed, turnDegrees, drivetrain),
-
-    // Triangle
-        new DriveDistance(-straightSpeed, driveDistance, drivetrain),
-        new TurnDegrees(turnSpeed, triangleTurnDegrees, drivetrain),
-        new DriveDistance(-straightSpeed, driveDistance, drivetrain),
-        new TurnDegrees(turnSpeed, triangleTurnDegrees, drivetrain),
-        new DriveDistance(-straightSpeed, driveDistance, drivetrain),
-        new TurnDegrees(turnSpeed, triangleTurnDegrees, drivetrain),
-
-    // Hexagon
-        new DriveDistance(-straightSpeed, hexagonInfinityDrivingDistance, drivetrain),
-        new TurnDegrees(turnSpeed, hexagonTurnDegrees, drivetrain),
-        new DriveDistance(-straightSpeed, hexagonInfinityDrivingDistance, drivetrain),
-        new TurnDegrees(turnSpeed, hexagonTurnDegrees, drivetrain),
-        new DriveDistance(-straightSpeed, hexagonInfinityDrivingDistance, drivetrain),
-        new TurnDegrees(turnSpeed, hexagonTurnDegrees, drivetrain),
-        new DriveDistance(-straightSpeed, hexagonInfinityDrivingDistance, drivetrain),
-        new TurnDegrees(turnSpeed, hexagonTurnDegrees, drivetrain),
-        new DriveDistance(-straightSpeed, hexagonInfinityDrivingDistance, drivetrain),
-        new TurnDegrees(turnSpeed, hexagonTurnDegrees, drivetrain),
-        new DriveDistance(-straightSpeed, hexagonInfinityDrivingDistance, drivetrain),
-        new TurnDegrees(turnSpeed, hexagonTurnDegrees, drivetrain));
-/*    
-    // Infinity (NOT YET COMPLETED, NOT SURE IF POSSIBLE WITH CURRENT EQUIPMENT)
-        new TurnDegrees(turnSpeed, InfinityTurnDegrees, drivetrain),
-        new DriveDistance(-straightSpeed, hexagonInfinityDrivingDistance, drivetrain),
-        new TurnDegrees(turnSpeed, InfinityTurnDegrees, drivetrain),
-        new DriveDistance(-straightSpeed, hexagonInfinityDrivingDistance, drivetrain));
-*/
+    m_drivetrain = drivetrain;
+    commandQueue = new ArrayList<Runnable>();
+    commandQueue.add(this::squarePattern);
+    commandQueue.add(this::trianglePattern);
+    commandQueue.add(this::hexagonPattern);
+    commandQueue.add(this::octagonPattern);
+    System.out.println(commandQueue.toString());
   }
+
+  public void runCommandQueue() {
+    for (Runnable command : commandQueue) {
+      command.run();
+    }
+  }
+
+  public void squarePattern() {
+    for (int i = 0; i < 4; i++) {
+      new DriveDistance(-straightSpeed, driveDistance, m_drivetrain);
+      new TurnDegrees(turnSpeed, turnDegrees, m_drivetrain);
+    }
+  }
+
+  public void trianglePattern() {
+    for (int i = 0; i < 3; i++) {
+      new DriveDistance(-straightSpeed, driveDistance, m_drivetrain);
+      new TurnDegrees(turnSpeed, triangleTurnDegrees, m_drivetrain);
+    }
+  }
+
+  public void hexagonPattern() {
+    for (int i = 0; i < 6; i++) {
+      new DriveDistance(-straightSpeed, driveDistance, m_drivetrain);
+      new TurnDegrees(turnSpeed, hexagonTurnDegrees, m_drivetrain);
+    }
+  }
+
+  public void octagonPattern() {
+    for (int i = 0; i < 8; i++) {
+      new DriveDistance(-straightSpeed, driveDistance, m_drivetrain);
+      new TurnDegrees(turnSpeed, turnDegrees, m_drivetrain);
+    }
+  }
+
+
+        // Square
+        // new DriveDistance(-straightSpeed, driveDistance, drivetrain),
+        // new TurnDegrees(turnSpeed, turnDegrees, drivetrain),
+        // new DriveDistance(-straightSpeed, driveDistance, drivetrain),
+        // new TurnDegrees(turnSpeed, turnDegrees, drivetrain),
+        // new DriveDistance(-straightSpeed, driveDistance, drivetrain),
+        // new TurnDegrees(turnSpeed, turnDegrees, drivetrain),
+        // new DriveDistance(-straightSpeed, driveDistance, drivetrain),
+        // new TurnDegrees(turnSpeed, turnDegrees, drivetrain),
+
+        // Triangle
+        // new DriveDistance(-straightSpeed, driveDistance, drivetrain),
+        // new TurnDegrees(turnSpeed, triangleTurnDegrees, drivetrain),
+        // new DriveDistance(-straightSpeed, driveDistance, drivetrain),
+        // new TurnDegrees(turnSpeed, triangleTurnDegrees, drivetrain),
+        // new DriveDistance(-straightSpeed, driveDistance, drivetrain),
+        // new TurnDegrees(turnSpeed, triangleTurnDegrees, drivetrain),
+
+        // Hexagon
+        // new DriveDistance(-straightSpeed, hexagonInfinityDrivingDistance, drivetrain),
+        // new TurnDegrees(turnSpeed, hexagonTurnDegrees, drivetrain),
+        // new DriveDistance(-straightSpeed, hexagonInfinityDrivingDistance, drivetrain),
+        // new TurnDegrees(turnSpeed, hexagonTurnDegrees, drivetrain),
+        // new DriveDistance(-straightSpeed, hexagonInfinityDrivingDistance, drivetrain),
+        // new TurnDegrees(turnSpeed, hexagonTurnDegrees, drivetrain),
+        // new DriveDistance(-straightSpeed, hexagonInfinityDrivingDistance, drivetrain),
+        // new TurnDegrees(turnSpeed, hexagonTurnDegrees, drivetrain),
+        // new DriveDistance(-straightSpeed, hexagonInfinityDrivingDistance, drivetrain),
+        // new TurnDegrees(turnSpeed, hexagonTurnDegrees, drivetrain),
+        // new DriveDistance(-straightSpeed, hexagonInfinityDrivingDistance, drivetrain),
+        // new TurnDegrees(turnSpeed, hexagonTurnDegrees, drivetrain));
 }
